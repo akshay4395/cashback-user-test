@@ -17,11 +17,11 @@ export const index = vandium.api().post(
     });
 
     try {
-      dynamoConfigInstance();
+      // dynamoConfigInstance();
       let res = await UserDetails.save();
       return callback(null, success(res));
     } catch (e) {
-      return callback(null, failure({ status: e.status, message: e.message }));
+      return callback(null, failure(e));
     }
   }
 );

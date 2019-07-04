@@ -1,7 +1,7 @@
-import vandium from "vandium";
-import UserModel from "../libs/dynamodb/userModel";
-import { success, failure } from "../utils/response-lib";
-import { dynamoConfigInstance } from "../config/dynamooseConfig";
+import vandium from 'vandium';
+import { User } from '../libs/dynamodb/userModel';
+import { success, failure } from '../utils/response-lib';
+import { dynamoConfigInstance } from '../config/dynamooseConfig';
 
 export const index = vandium.api().post(
   {
@@ -11,14 +11,12 @@ export const index = vandium.api().post(
     }
   },
   async (event, context, callback) => {
-    const UserDetails = new UserModel({
-      username: event.body.username,
-      email: event.body.email
-    });
-
+    await dynamoConfigInstance();
     try {
-      // dynamoConfigInstance();
-      let res = await UserDetails.save();
+      User.create({
+        username: event.body.username,
+        email: event.body.email
+      });
       return callback(null, success(res));
     } catch (e) {
       return callback(null, failure(e));

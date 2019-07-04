@@ -1,5 +1,5 @@
-import dynamoose from 'dynamoose';
-import AWS from 'aws-sdk';
+import dynamoose from "dynamoose";
+import AWS from "aws-sdk";
 
 export const dynamoConfigInstance = () => {
   return new Promise((res, rej) => {
@@ -10,7 +10,7 @@ export const dynamoConfigInstance = () => {
         region: process.env.REGION
       });
 
-      const dynamoDB = new AWS.dynamoDB();
+      const dynamoDB = new AWS.DynamoDB();
       dynamoose.setDDB(dynamoDB);
       res();
     } catch (e) {

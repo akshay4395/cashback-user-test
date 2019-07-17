@@ -1,21 +1,16 @@
 import axios from "axios";
 
-export const MtbCheckUser = async (type, data, provider) => {
+export const MtbCheckUser = async (type, data, provider, sessionId) => {
   let res = await axios.get(
-    `https://www.mytravelbiz-api.com/0.1/mtb3/user/verify-data?type=${type}&data=${data}&provider=${provider}`
+    `https://devnew.mytravelbiz-api.com/mtb3/user/verify-data?type=${type}&data=${data}&provider=${provider}&sessionId=${sessionId}`
   );
 
   return res;
 };
 
 export const MtbRegistration = async body => {
-  let res = await fetch(
-    "https://www.mytravelbiz-api.com/0.1/mtb/user/registration",
-    {
-      method: "POST",
-      body: JSON.stringify(body)
-    }
-  );
+  console.log(body);
+  let res = await axios.post("http://localhost:3001/user/registration", body);
   return res;
 };
 

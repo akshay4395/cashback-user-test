@@ -1,25 +1,31 @@
-import dynamoose from 'dynamoose';
+import dynamoose from "dynamoose";
 const { Schema } = dynamoose;
 
 const userSchema = new Schema(
   {
-    user_id: String,
-    firstName: String,
-    lastName: String,
-    username: String,
+    // dist_id: String,
+    cognitoUsername: String,
+    country: String,
     email: String,
-    refer_through: String,
-    user_type: String,
-    latitude: String,
-    longitude: String,
-    refer_link: String,
-    vip_member: Boolean,
-    total_earnings: Number,
-    refer_id: String
+    last_name: String,
+    level: Number,
+    package: String,
+    provider: String,
+    vip: Boolean,
+    username: String,
+    firstname: String,
+    uuid: String,
+    phone_number: String,
+    phoneCode: String,
+    parentId: String,
+    rankId: String
   },
   {
     timestamps: true
   }
 );
 
-export const User = dynamoose.model('user', userSchema);
+export const User = dynamoose.model(
+  `sixDegrees-${process.env.STAGE}`,
+  userSchema
+);

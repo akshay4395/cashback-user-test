@@ -47,3 +47,17 @@ functions:
           path: users/register
           method: post
           cors: true
+  userEmailVerify:
+    handler: users/checkUserEmail.checkUserEmail
+    events:
+      - http:
+          path: users/verify-email
+          method: post
+          cors: true
+  UsernameVerify:
+    handler: users/checkUserUsername.checkUsername
+    events:
+      - http:
+          path: users/verify-username
+          method: post
+          cors: true

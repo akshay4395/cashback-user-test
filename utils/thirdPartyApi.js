@@ -1,8 +1,9 @@
 import axios from "axios";
+import randomstring from "randomstring";
 
-export const MtbCheckUser = async (type, data, provider, sessionId) => {
+export const MtbCheckUser = async (type, data, provider) => {
   let res = await axios.get(
-    `https://devnew.mytravelbiz-api.com/mtb3/user/verify-data?type=${type}&data=${data}&provider=${provider}&sessionId=${sessionId}`
+    `https://devnew.mytravelbiz-api.com/mtb3/user/verify-data?type=${type}&data=${data}&provider=${provider}`
   );
 
   return res;

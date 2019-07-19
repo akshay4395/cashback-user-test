@@ -1,7 +1,7 @@
 import dynamoose from "dynamoose";
 const { Schema } = dynamoose;
 
-const userSchema = new Schema(
+const MtbuserSchema = new Schema(
   {
     dist_id: String,
     cognitoUsername: String,
@@ -11,21 +11,24 @@ const userSchema = new Schema(
     level: Number,
     package: String,
     provider: String,
-    vip: Boolean,
+    status: String,
+    step: String,
+    userType: Boolean,
     username: String,
-    firstname: String,
+    first_name: String,
     uuid: String,
-    phone_number: String,
+    phoneNumber: String,
     phoneCode: String,
     parentId: String,
-    rankId: String
+    RankId: String
   },
   {
     timestamps: true
   }
 );
 
-export const User = dynamoose.model(
-  `sixDegrees-${process.env.STAGE}`,
-  userSchema
+export const MtbUser = dynamoose.model(
+  `MtbUsers-${process.env.STAGE}`,
+  MtbuserSchema,
+  { update: true }
 );

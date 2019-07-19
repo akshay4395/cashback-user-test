@@ -2,10 +2,19 @@ import vandium from "vandium";
 import uuid from "uuid";
 import uuidv4 from "uuid/v1";
 import { User } from "../libs/dynamodb/userModel";
+import { MtbUser } from "../libs/dynamodb/MTBUser";
+import { SubTenants } from "../libs/dynamodb/SubTenants";
 import { success, failure } from "../utils/response-lib";
 import { dynamoConfigInstance } from "../config/dynamooseConfig";
 import { MtbCheckUser, MtbRegistration } from "../utils/thirdPartyApi";
 import { registerInCognito } from "../utils/cognito";
+import {
+  prodigixSoapRequest,
+  prodigixAPI,
+  options,
+  XMLtoJSON
+} from "../utils/prodigix";
+
 export const index = vandium.api().POST(
   {
     body: {
@@ -14,48 +23,99 @@ export const index = vandium.api().POST(
     }
   },
   async (event, context, callback) => {
-    // let poolData = {
-    //   userPoolId: process.env.USER_POOL_ID,
-    //   userPoolWebClientId: process.env.APP_CLIENT_ID,
-    //   region: process.env.REGION,
-    //   identityPoolId: process.env.IDENTITY_POOL_ID,
-    //   mandatorySignIn: false
-    // };
     await dynamoConfigInstance();
 
     try {
+      let userDetail;
+      let mtbUser;
+      let subtenants;
       const { body } = event;
-      let mtbUserName = await MtbCheckUser(
-        "userName",
-        body.username,
-        "mytravelbiz"
+      // let mtbUserName = await MtbCheckUser(
+      //   "userName",
+      //   body.username,
+      //   "mytravelbiz"
+      // );
+      let sessionId = uuid();
+      // let mtbUserEmail = await MtbCheckUser("email", body.email, "mytravelbiz");
+      // if (mtbUserEmail.status && mtbUserName.status) {
+      let userCognito = {
+        email: body.email,
+        password: body.password,
+        username: uuid()
+      };
+      const cognitoResponse = await registerInCognito(userCognito);
+      let prodigixBody = {
+        username: body.username,
+        email: body.email,
+        password: body.password,
+        sponsor: body.sponsor,
+        country: body.country,
+        rank: 0
+      };
+      let prodigix = await prodigixAPI(
+        options(
+          prodigixSoapRequest(prodigixBody),
+          "AddDistributor",
+          "distributorws"
+        )
       );
-      let mtbUserEmail = await MtbCheckUser(
-        "email",
-        body.email,
-        "mytravelbiz",
-        body.sessionId
-      );
-      if (mtbUserEmail.status && mtbUserName.status) {
-        let userCognito = {
-          email: body.email,
-          password: body.password,
-          firstName: body.firstName
-        };
-        const cognitoResponse = await registerInCognito(userCognito);
-        const userData = JSON.stringify(cognitoResponse.user);
-        let userDetail = await User.create({
-          username: body.username,
-          email: body.email,
-          country: body.country,
-          provider: "6degrees",
-          cognitoUsername: userData.username,
-          uuid: uuidv4()
-        });
-        console.log(userDetail, "userData");
+      console.log(prodigix);
+      let parsedData = await XMLtoJSON(prodigix.body);
+      let success =
+        parsedData["soap:Envelope"]["soap:Body"][0].AddDistributorResponse[0]
+          .AddDistributorResult[0].Success[0];
+      let distId;
+      if (success) {
+        distId =
+          parsedData["soap:Envelope"]["soap:Body"][0].AddDistributorResponse[0]
+            .AddDistributorResult[0].DistID[0];
       }
-
-      return callback(null, success("hello"));
+      console.log(distId, "iddd");
+      const users_username = JSON.parse(
+        JSON.stringify(cognitoResponse.user.username)
+      );
+      console.log(users_username, "username");
+      userDetail = await User.create({
+        dist_id: distId,
+        username: body.username,
+        email: body.email,
+        domain: `${body.username}.6degrees.Cash`,
+        country: body.country,
+        provider: "6degrees",
+        cognitoUsername: users_username,
+        uuid: uuidv4()
+      });
+      mtbUser = await MtbUser.create({
+        dist_id: distId,
+        username: body.username,
+        email: body.email,
+        country: body.country,
+        domain: `${body.username}.mytravelbiz.com`,
+        provider: "mtb",
+        cognitoUsername: users_username,
+        uuid: uuidv4()
+      });
+      subtenants = await SubTenants.create({
+        distId: distId,
+        cognitoUsername: users_username,
+        level: 0,
+        package: 1,
+        provider: "mytravelbiz",
+        domain: `${body.username}.mytravelbiz.com`,
+        RankId: 0,
+        mainAccount: true,
+        newUser: true,
+        username: body.username,
+        email: body.email,
+        country: body.country
+      });
+      // }
+      let responseBody = {
+        mtb: mtbUser,
+        degree: userDetail,
+        subtenants
+      };
+      return callback(null, success(responseBody));
     } catch (e) {
       console.log(e);
       return callback(null, failure(e));

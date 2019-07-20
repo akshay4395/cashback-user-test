@@ -1,10 +1,10 @@
-import _ from 'lodash';
-import uuidv1 from 'uuid/v1';
-import { CognitoIdentityServiceProvider } from 'aws-sdk';
+import _ from "lodash";
+import uuidv1 from "uuid/v1";
+import { CognitoIdentityServiceProvider } from "aws-sdk";
 import {
   CognitoUserAttribute,
   CognitoUserPool
-} from 'amazon-cognito-identity-js';
+} from "amazon-cognito-identity-js";
 // import { config } from "../config";
 
 export function registerInTlcCognito(obj, domain, userType) {
@@ -14,9 +14,9 @@ export function registerInTlcCognito(obj, domain, userType) {
       ClientId: process.env.TLC_CLIENT_ID
     });
     let attributeList = [];
-    let email = { Name: 'email', Value: obj.email },
+    let email = { Name: "email", Value: obj.email },
       // referrerLink = { Name: "website", Value: domain },
-      firstName = { Name: 'name', Value: obj.firstName },
+      firstName = { Name: "name", Value: obj.firstName },
       // type = { Name: "custom:type", Value: userType },
       uuid = uuidv1();
     let attributeEmail = new CognitoUserAttribute(email);

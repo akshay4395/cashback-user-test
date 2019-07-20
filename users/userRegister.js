@@ -18,7 +18,8 @@ import {
   subtenantUserRegistration,
   tlcUserRegistartion,
   getUserByEmail,
-  cashbackUserRegistration
+  cashbackUserRegistration,
+  getSponsorId
 } from "../libs/dynamodb/dynamo-request";
 
 export const index = vandium.api().POST(
@@ -99,6 +100,10 @@ export const index = vandium.api().POST(
         email: body.email,
         country: body.country,
         package: 1,
+        personalInformation: {
+          firstName: "-",
+          lastName: "-"
+        },
         domain: `${body.username}.mytravelbiz.com`,
         provider: "mtb",
         sponsorId: domain_provider_id,
@@ -109,8 +114,12 @@ export const index = vandium.api().POST(
         userId: uuidv4(),
         distId: distId,
         cognitoUsername: users_username,
+        personalInformation: {
+          firstName: "-",
+          lastName: "-"
+        },
         level: 0,
-        package: 1,
+        package: 0,
         provider: "mytravelbiz",
         domain: `${body.username}.mytravelbiz.com`,
         RankId: 0,
@@ -128,6 +137,10 @@ export const index = vandium.api().POST(
         username: body.username,
         email: body.email,
         country: body.country,
+        personalInformation: {
+          firstName: "-",
+          lastName: "-"
+        },
         provider: "tlc",
         cognitoUsername: users_username,
         userId: uuidv4()

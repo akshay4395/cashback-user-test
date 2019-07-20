@@ -40,10 +40,16 @@ export const mtbUserRegistration = (data, tableName) => {
         username: data.username,
         email: data.email,
         country: data.country,
+        first_name: data.personalInformation.firstName,
+        last_ame: data.personalInformation.lastName,
         domain: data.domain,
         provider: data.provider,
         sponsorId: data.sponsorId,
         package: Number(data.package),
+        level: 0,
+        status: "pending",
+        step: "complete",
+        userType: "rep",
         cognitoUsername: data.cognitoUsername,
         uuid: data.userId,
         createdAt: new Date().getTime(),
@@ -71,7 +77,17 @@ export const tlcUserRegistartion = (data, tableName) => {
         username: data.username,
         email: data.email,
         country: data.country,
-
+        lastName: data.personalInformation.lastName,
+        phoneNumber: "012345",
+        status: "success",
+        step: "complete",
+        userType: "rep",
+        autoBy: false,
+        level: 0,
+        package: data.package,
+        mainAccount: true,
+        RankId: 1,
+        name: data.personalInformation.firstName,
         provider: data.provider,
         cognitoUsername: data.cognitoUsername,
         uuid: data.userId,
@@ -108,6 +124,7 @@ export const subtenantUserRegistration = (data, tableName) => {
         country: data.country,
         email: data.email,
         uuid: data.userId,
+        personalInformation: data.personalInformation,
         package: Number(data.package),
         step: "complete",
         createdAt: new Date().getTime(),
@@ -157,6 +174,16 @@ export function getUserByUsername(username) {
   };
   return dynamoDbLib.call("query", params);
 }
+
+export const getSubDomain = referrer => {
+  let content =
+    referrer.indexOf("http://") !== -1
+      ? referrer.replace("http://", "")
+      : referrer.replace("https://", "");
+  let splitData = content.split(".");
+  console.log(splitData);
+  return splitData.length >= 3 ? content : null;
+};
 
 export function getSponsorId(referrer) {
   return new Promise(async (resolve, reject) => {

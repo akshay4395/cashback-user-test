@@ -15,28 +15,20 @@ import {
 } from "../utils/prodigix";
 import { cashbackUserRegistration } from "../libs/dynamodb/dynamo-request";
 
-export const index = vandium.api().POST(
-  {
-    body: {
-      username: vandium.types.string().required(),
-      email: vandium.types.string().required()
-    }
-  },
-  async (event, context, callback) => {
-    await dynamoConfigInstance();
+export const index = async (event, context, callback) => {
+  await dynamoConfigInstance();
 
-    try {
-      let userDetail;
-      const { body } = event;
-      userDetail = await cashbackUserRegistration(body, "sixDegrees");
-      console.log(body);
-      let responseBody = {
-        degree: userDetail
-      };
-      return callback(null, success(responseBody));
-    } catch (e) {
-      console.log(e);
-      return callback(null, failure(e));
-    }
+  try {
+    let userDetail;
+    const { body } = event;
+    userDetail = await cashbackUserRegistration(body, "sixDegrees");
+    console.log(body);
+    let responseBody = {
+      degree: userDetail
+    };
+    return callback(null, success(responseBody));
+  } catch (e) {
+    console.log(e);
+    return callback(null, failure(e));
   }
-);
+};

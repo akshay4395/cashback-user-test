@@ -61,3 +61,5 @@ functions:
           path: users/verify-username
           method: post
           cors: true
+  mtbRegister:
+    handler: users/mtbRegister.index

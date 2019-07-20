@@ -1,6 +1,6 @@
-import * as dynamoDbLib from './dynamo-lib';
-import { success, failure } from '../../utils/response-lib';
-import uuid from 'uuid';
+import * as dynamoDbLib from "./dynamo-lib";
+import { success, failure } from "../../utils/response-lib";
+import uuid from "uuid";
 
 export const cashbackUserRegistration = (data, tableName) => {
   return new Promise(async resolve => {
@@ -14,6 +14,7 @@ export const cashbackUserRegistration = (data, tableName) => {
         provider: data.provider,
         cognitoUsername: data.cognitoUsername,
         uuid: data.uuid,
+        vip: data.vip,
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime()
       };
@@ -21,12 +22,12 @@ export const cashbackUserRegistration = (data, tableName) => {
         TableName: `${tableName}-${process.env.STAGE}`,
         Item: dataForDb
       };
-      console.log('params', params);
-      await dynamoDbLib.call('put', params);
-      console.log('Success');
+      console.log("params", params);
+      await dynamoDbLib.call("put", params);
+      console.log("Success");
       resolve(dataForDb);
     } catch (error) {
-      console.log('ERROR', error);
+      console.log("ERROR", error);
     }
   });
 };
@@ -41,6 +42,7 @@ export const mtbUserRegistration = (data, tableName) => {
         country: data.country,
         domain: data.domain,
         provider: data.provider,
+        sponsorId: data.sponsorId,
         package: Number(data.package),
         cognitoUsername: data.cognitoUsername,
         uuid: data.userId,
@@ -51,12 +53,12 @@ export const mtbUserRegistration = (data, tableName) => {
         TableName: `${tableName}-${process.env.STAGE}`,
         Item: dataForDb
       };
-      console.log('params', params);
-      await dynamoDbLib.call('put', params);
-      console.log('Success');
+      console.log("params", params);
+      await dynamoDbLib.call("put", params);
+      console.log("Success");
       resolve(dataForDb);
     } catch (error) {
-      console.log('ERROR', error);
+      console.log("ERROR", error);
     }
   });
 };
@@ -80,12 +82,12 @@ export const tlcUserRegistartion = (data, tableName) => {
         TableName: `${tableName}-${process.env.STAGE}`,
         Item: dataForDb
       };
-      console.log('params', params);
-      await dynamoDbLib.call('put', params);
-      console.log('Success');
+      console.log("params", params);
+      await dynamoDbLib.call("put", params);
+      console.log("Success");
       resolve(dataForDb);
     } catch (error) {
-      console.log('ERROR', error);
+      console.log("ERROR", error);
     }
   });
 };
@@ -107,7 +109,7 @@ export const subtenantUserRegistration = (data, tableName) => {
         email: data.email,
         uuid: data.userId,
         package: Number(data.package),
-        step: 'complete',
+        step: "complete",
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime()
       };
@@ -115,12 +117,12 @@ export const subtenantUserRegistration = (data, tableName) => {
         TableName: `${tableName}-${process.env.STAGE}`,
         Item: dataForDb
       };
-      console.log('params', params);
-      await dynamoDbLib.call('put', params);
-      console.log('Success');
+      console.log("params", params);
+      await dynamoDbLib.call("put", params);
+      console.log("Success");
       resolve(dataForDb);
     } catch (error) {
-      console.log('ERROR', error);
+      console.log("ERROR", error);
     }
   });
 };
@@ -128,30 +130,65 @@ export const subtenantUserRegistration = (data, tableName) => {
 export function getUserByEmail(email) {
   let params = {
     TableName: `sixDegrees-${process.env.STAGE}`,
-    IndexName: 'email-createdAt-index',
-    KeyConditionExpression: '#email = :userEmail',
+    IndexName: "email-createdAt-index",
+    KeyConditionExpression: "#email = :userEmail",
     ExpressionAttributeNames: {
-      '#email': 'email'
+      "#email": "email"
     },
     ExpressionAttributeValues: {
-      ':userEmail': email
+      ":userEmail": email
     }
   };
-  return dynamoDbLib.call('query', params);
+  return dynamoDbLib.call("query", params);
 }
 
 export function getUserByUsername(username) {
   console.log(username);
   let params = {
     TableName: `sixDegrees-${process.env.STAGE}`,
-    IndexName: 'username-createdAt-index',
-    KeyConditionExpression: '#username = :username',
+    IndexName: "username-createdAt-index",
+    KeyConditionExpression: "#username = :username",
     ExpressionAttributeNames: {
-      '#username': 'username'
+      "#username": "username"
     },
     ExpressionAttributeValues: {
-      ':username': username
+      ":username": username
     }
   };
-  return dynamoDbLib.call('query', params);
+  return dynamoDbLib.call("query", params);
+}
+
+export function getSponsorId(referrer) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let domain = getSubDomain(referrer);
+      if (domain && domain !== "www.mytravelbiz.com") {
+        let paramsUser = {
+          TableName: `SubTenants-${config.tableStage}`,
+          IndexName: "domain-provider-index",
+          KeyConditionExpression: "#domain = :data",
+          ExpressionAttributeNames: {
+            "#domain": "domain"
+          },
+          ExpressionAttributeValues: {
+            ":data": domain
+          }
+        };
+        let result = await dynamoDbLib.call("query", paramsUser);
+        if (result.Count) {
+          let returnData = result.Items[0].distId;
+          console.log("**** Referrer Dist ID ****");
+          console.log(returnData);
+          resolve(returnData);
+        } else {
+          resolve(3);
+        }
+      } else {
+        resolve(3);
+      }
+    } catch (error) {
+      console.log("ERROR", error);
+      reject(error);
+    }
+  });
 }

@@ -10,8 +10,8 @@ import {
 export function registerInTlcCognito(obj, domain, userType) {
   return new Promise(function(resolve, reject) {
     const userPool = new CognitoUserPool({
-      UserPoolId: process.env.TLC_USER_POOL_ID,
-      ClientId: process.env.TLC_CLIENT_ID
+      UserPoolId: 'us-east-1_EHcouR1eG',
+      ClientId: '1n4ftunb8b4jdigfvnt76l5222'
     });
     let attributeList = [];
     let email = { Name: 'email', Value: obj.email },

@@ -1,22 +1,22 @@
-import _ from "lodash";
-import uuidv1 from "uuid/v1";
-import { CognitoIdentityServiceProvider } from "aws-sdk";
+import _ from 'lodash';
+import uuidv1 from 'uuid/v1';
+import { CognitoIdentityServiceProvider } from 'aws-sdk';
 import {
   CognitoUserAttribute,
   CognitoUserPool
-} from "amazon-cognito-identity-js";
+} from 'amazon-cognito-identity-js';
 // import { config } from "../config";
 
 export function registerInCognito(obj, domain, userType) {
   return new Promise(function(resolve, reject) {
     const userPool = new CognitoUserPool({
-      UserPoolId: process.env.USER_POOL_ID,
-      ClientId: process.env.APP_CLIENT_ID
+      UserPoolId: 'us-east-1_wWoX8kXwD',
+      ClientId: '7hg3nvcvvi932grv813nescku6'
     });
     let attributeList = [];
-    let email = { Name: "email", Value: obj.email },
+    let email = { Name: 'email', Value: obj.email },
       // referrerLink = { Name: "website", Value: domain },
-      firstName = { Name: "name", Value: obj.firstName },
+      firstName = { Name: 'name', Value: obj.firstName },
       // type = { Name: "custom:type", Value: userType },
       uuid = uuidv1();
     let attributeEmail = new CognitoUserAttribute(email);
